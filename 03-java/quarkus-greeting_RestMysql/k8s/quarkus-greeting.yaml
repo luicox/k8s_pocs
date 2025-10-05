@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quarkus-greeting
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quarkus-greeting
+  template:
+    metadata:
+      labels:
+        app: quarkus-greeting
+    spec:
+      containers:
+        - name: quarkus-greeting
+          image: quarkus-greeting:1.0.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: QUARKUS_DATASOURCE_JDBC_URL
+              value: jdbc:mysql://mysql:3306/transactionsdb
+            - name: QUARKUS_DATASOURCE_USERNAME
+              value: root
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              value: root
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quarkus-greeting
+spec:
+  selector:
+    app: quarkus-greeting
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8080
+  type: LoadBalancer

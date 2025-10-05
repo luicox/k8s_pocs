@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quarkus-hello
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quarkus-hello
+  template:
+    metadata:
+      labels:
+        app: quarkus-hello
+    spec:
+      containers:
+        - name: quarkus-hello
+          image: quarkus-hello:1.0.0-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: "-Dquarkus.http.host=0.0.0.0"
+          volumeMounts:
+            - name: logs
+              mountPath: /opt/quarkus/logs
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: quarkus-hello-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quarkus-hello-service
+spec:
+  selector:
+    app: quarkus-hello
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: quarkus-hello-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/quarkus-hello"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: quarkus-hello-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
