@@ -219,7 +219,7 @@ json
 # GGuardar en mysql
 
 kubectl apply -f k8s/mysql.yaml
-./mvnw clean package
+./mvn clean package
 docker build -f src/main/docker/Dockerfile.jvm -t quarkus-greeting:1.0.0 .
 kubectl apply -f k8s/quarkus-greeting.yaml
 curl -X POST http://localhost:8081/transactions      -H "Content-Type: application/json"      -d '{"accountNumber":"1","operationNumber":"0293","amount":"10.02"}'

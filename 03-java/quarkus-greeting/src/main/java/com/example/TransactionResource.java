@@ -5,18 +5,21 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 
 @Path("/transactions")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class TransactionResource {
 
+    @Inject
+    TransactionRepository transactionRepository;
+
     @POST
     @Transactional
     public Response create(Transaction transaction) {
-        transaction.persist();
-        return Response.status(Response.Status.CREATED)
-                       .entity(transaction)
-                       .build();
+        return transactionRepository.create(transaction);
     }
 }
